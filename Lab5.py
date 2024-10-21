@@ -56,35 +56,45 @@ files_collection.update_one({ 'file_id': 1 }, { '$set': { 'shared': True } })
 # 4.2: Xóa tệp với file_id = 3
 files_collection.delete_one({ 'file_id': 3 })
 
-# Bước 5: Xem lại dữ liệu sau khi cập nhật và xóa
-# Kiểm tra lại tất cả tệp trong bộ sưu tập
+# Bước 5: Các truy vấn bổ sung
+
+# Câu hỏi 1: Tìm tất cả tệp của người dùng có tên là "Nguyen Van A".
+print("\nTất cả tệp của người dùng 'Nguyen Van A':")
+for file in files_collection.find({ 'owner': "Nguyen Van A" }):
+    print(file)
+
+# Câu hỏi 2: Tìm tệp lớn nhất trong bộ sưu tập.
+print("\nTệp lớn nhất trong bộ sưu tập:")
+largest_file = files_collection.find().sort('size', -1).limit(1)
+for file in largest_file:
+    print(file)
+
+# Câu hỏi 3: Tìm số lượng tệp có kích thước nhỏ hơn 1000KB.
+small_files_count = files_collection.count_documents({ 'size': { '$lt': 1000 } })
+print(f"\nSố lượng tệp có kích thước nhỏ hơn 1000KB: {small_files_count}")
+
+# Câu hỏi 4: Tìm tất cả tệp được tạo trong tháng 1 năm 2024.
+print("\nTất cả tệp được tạo trong tháng 1 năm 2024:")
+for file in files_collection.find({ 
+    'created_at': { 
+        '$gte': datetime(2024, 1, 1), 
+        '$lt': datetime(2024, 2, 1) 
+    }
+}):
+    print(file)
+
+# Câu hỏi 5: Cập nhật tên tệp với file_id = 4 thành "New Spreadsheet.xlsx".
+files_collection.update_one({ 'file_id': 4 }, { '$set': { 'name': "New Spreadsheet.xlsx" } })
+print("\nTên tệp với file_id = 4 đã được cập nhật.")
+
+# Câu hỏi 6: Xóa tất cả tệp có kích thước nhỏ hơn 1000KB.
+files_collection.delete_many({ 'size': { '$lt': 1000 } })
+print("\nTất cả tệp có kích thước nhỏ hơn 1000KB đã được xóa.")
+
+# Bước 6: Xem lại dữ liệu sau khi cập nhật và xóa
 print("\nTất cả tệp sau khi cập nhật và xóa:")
 for file in files_collection.find():
     print(file)
-# // Câu hỏi 1: Tìm tất cả tệp của người dùng có tên là "Nguyen Van A".
-# db.files.find({ owner: "Nguyen Van A" })
-print('\n Tat ca tep cua nguoi dung NVA')
-files_collection.find({"owner":"Nguyen Van A"})
-for select in files_collection.find():
-    print(select)
-# // Câu hỏi 2: Tìm tệp lớn nhất trong bộ sưu tập.
-# db.files.find().sort({ size: -1 }).limit(1)
-#
-# // Câu hỏi 3: Tìm số lượng tệp có kích thước nhỏ hơn 1000KB.
-# db.files.countDocuments({ size: { $lt: 1000 } })
-#
-# // Câu hỏi 4: Tìm tất cả tệp được tạo trong tháng 1 năm 2024.
-# db.files.find({
-#     created_at: {
-#         $gte: new Date("2024-01-01"),
-#         $lt: new Date("2024-02-01")
-#     }
-# })
-#
-# // Câu hỏi 5: Cập nhật tên tệp với `file_id` là 4 thành "New Spreadsheet.xlsx".
-# db.files.updateOne({ file_id: 4 }, { $set: { name: "New Spreadsheet.xlsx" } })
-#
-# // Câu hỏi 6: Xóa tất cả tệp có kích thước nhỏ hơn 1000KB.
-# db.files.deleteMany({ size: { $lt: 1000 } })
+
 # Đóng kết nối
 client.close()
